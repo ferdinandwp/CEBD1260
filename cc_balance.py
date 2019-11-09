@@ -30,6 +30,7 @@ for f in nb_features:
     print('{}=> Max:{} ; Min:{}'.format(f,cc_balance_df[f].max(),cc_balance_df[f].min()))
 print('--------------------------------------------------')
 
+
 # fill na with mean value
 cc_balance_df['AMT_DRAWINGS_ATM_CURRENT'].fillna(cc_balance_df['AMT_DRAWINGS_ATM_CURRENT'].mean(),inplace=True)
 cc_balance_df['AMT_DRAWINGS_OTHER_CURRENT'].fillna(cc_balance_df['AMT_DRAWINGS_OTHER_CURRENT'].mean(),inplace=True)

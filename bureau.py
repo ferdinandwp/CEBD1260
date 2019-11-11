@@ -65,6 +65,8 @@ print("Int32 Max:", np.iinfo(np.int32).max, "Int32 Max:", np.iinfo(np.int32).min
 
 # Converting to lower format to optimize memory usage
 
+train_df['SK_ID_CURR'] = train_df['SK_ID_CURR'].astype(np.int32)
+train_df['SK_ID_BUREAU'] = train_df['SK_ID_BUREAU'].astype(np.int32)
 train_df['DAYS_CREDIT'] = train_df['DAYS_CREDIT'].astype(np.int16)
 train_df['CREDIT_DAY_OVERDUE'] = train_df['CREDIT_DAY_OVERDUE'].astype(np.int16)
 train_df['DAYS_CREDIT_ENDDATE'] = train_df['DAYS_CREDIT_ENDDATE'].astype(np.float16)

@@ -94,5 +94,13 @@ train_df = pd.concat([train_df, temp_df], axis=1)
 # Encoding remaining object with more than 5 categories using label encoder
 le = LabelEncoder()
 
-le.fit_transform(train_df['ORGANIZATION_TYPE'])
+le.fit_transform(train_df['CREDIT_TYPE'])
 train_df['CREDIT_TYPE'].factorize(sort=True)
+
+# dropping the one-hot-coded columns (CREDIT_ACTIVE AND CREDIT_CURRENCY)
+train_df.drop(['CREDIT_ACTIVE', 'CREDIT_CURRENCY'], axis=1)
+
+print(train_df.shape)
+
+for f in train_df:
+    print(" {}: Type:{} Max:{} Min:{}".format(f, train_df[f].dtype, train_df[f].max(), train_df[f].min()))

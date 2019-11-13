@@ -39,3 +39,10 @@ train_df['MONTHS_BALANCE'] = train_df['MONTHS_BALANCE'].astype(np.int8)
 
 mem_use = train_df.memory_usage().sum() / 1024**3
 print('Memory usage of dataframe is {:.2f} GB'.format(mem_use))
+
+# Encoding remaining object with more than 5 categories using label encoder
+le = LabelEncoder()
+
+le.fit_transform(train_df['STATUS'])
+train_df['STATUS'].factorize(sort=True)
+print(le.classes_)

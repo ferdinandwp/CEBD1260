@@ -106,3 +106,37 @@ print(train_df.shape)
 
 for f in train_df:
     print(" {}: Type:{} Max:{} Min:{}".format(f, train_df[f].dtype, train_df[f].max(), train_df[f].min()))
+
+# Aggregating the features
+
+client_ids = list(train_df['SK_ID_CURR'].unique())
+temp_df1 = train_df[train_df['SK_ID_CURR'].isin(client_ids)]
+
+agg_dict = {
+    'CREDIT_ACTIVE': ['nunique'],
+    'CREDIT_CURRENCY': ['nunique'],
+    'DAYS_CREDIT': ['mean', 'max', 'min'],
+    'CREDIT_DAY_OVERDUE': ['mean', 'max', 'min'],
+    'DAYS_CREDIT_ENDDATE': ['mean', 'max', 'min'],
+    'DAYS_ENDDATE_FACT': ['mean', 'max', 'min'],
+    'AMT_CREDIT_MAX_OVERDUE': ['mean', 'max', 'min'],
+    'CNT_CREDIT_PROLONG': ['mean', 'max', 'min'],
+    'AMT_CREDIT_SUM': ['mean', 'max', 'min'],
+    'AMT_CREDIT_SUM_DEBT': ['mean', 'max', 'min'],
+    'AMT_CREDIT_SUM_LIMIT': ['mean', 'max', 'min'],
+    'AMT_CREDIT_SUM_OVERDUE': ['mean', 'max', 'min'],
+    'CREDIT_TYPE': ['nunique'],
+    'DAYS_CREDIT_UPDATE': ['mean', 'max', 'min'],
+    'AMT_ANNUITY': ['mean', 'max', 'min']
+}
+
+agg_df = temp_df1.groupby('SK_ID_CURR').agg(agg_dict)
+# Arrange columns names to be more readable
+agg_df.columns = ['BURO_{}_{}'.format(x[0], x[1]) for x in agg_df.columns.tolist()]
+
+temp_df1 = temp_df1.merge(agg_df, on='SK_ID_CURR', how='left')
+
+print(temp_df1.shape)
+
+for f in temp_df1:
+    print(" {}: Type:{} Max:{} Min:{}".format(f, temp_df1[f].dtype, temp_df1[f].max(), temp_df1[f].min()))

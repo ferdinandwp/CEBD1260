@@ -5,7 +5,7 @@ import pandas as pd
 import os
 import glob
 
-def preprocessing():
+def preprocessing_ipay():
     # Read data
     path = '/Users/ferdinand/Desktop/data'
     file_name = os.path.join(path,'installments_payments.csv')

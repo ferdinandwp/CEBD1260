@@ -10,14 +10,7 @@ def preprocessing_prev_app():
     path = '/Users/ferdinand/Desktop/data'
     file_name = os.path.join(path,'previous_application.csv')
     prev_app_df = pd.read_csv(file_name)
-    print(prev_app_df.shape)
-
-    # Check memory size
-    mem_use = prev_app_df.memory_usage().sum()/1024**2 # Convert to MB
-    print('--------------------------------------------------')
-    print('Initial dataset memory usage for application_train: {:2f} MB'.format(mem_use))
-    print('--------------------------------------------------')
-
+    
     # split into obj and non obj features
     features = [f for f in prev_app_df.columns.values]
 
@@ -29,10 +22,6 @@ def preprocessing_prev_app():
             nb_features.append(f)
         elif str(prev_app_df[f].dtype) in ('object'):
             obj_features.append(f)
-
-    for f in nb_features:
-        print('{}: Max= {} ; Min= {}'.format(f,prev_app_df[f].max(),prev_app_df[f].min()))
-    print('--------------------------------------------------')
 
     # fill na as required
     prev_app_df['AMT_ANNUITY'].fillna(prev_app_df['AMT_ANNUITY'].mean(),inplace=True)

@@ -10,14 +10,9 @@ def preprocessing_cc_balance():
     path = '/Users/ferdinand/Desktop/data'
     file_name = os.path.join(path,'credit_card_balance.csv')
     cc_balance_df = pd.read_csv(file_name)
-    print('--------------------------------------------------')
-    print('Shape of the dataframe: {}'.format(cc_balance_df.shape))
-    print('--------------------------------------------------')
 
     # Check memory size
     mem_use = cc_balance_df.memory_usage().sum()/1024**2 # Convert to MB
-    print('Initial dataset memory usage for application_train: {:2f} MB'.format(mem_use))
-    print('--------------------------------------------------')
 
     #identify features with int & float
     features = [f for f in cc_balance_df.columns.values]
@@ -25,12 +20,6 @@ def preprocessing_cc_balance():
     for f in features:
         if str(cc_balance_df[f].dtype) in ['int64','float64']:
             nb_features.append(f)
-
-    # Idenitify max & min of int64 & float 64 features
-    for f in nb_features:
-        print('{}=> Max:{} ; Min:{}'.format(f,cc_balance_df[f].max(),cc_balance_df[f].min()))
-    print('--------------------------------------------------')
-
 
     # fill na with mean value
     cc_balance_df['AMT_DRAWINGS_ATM_CURRENT'].fillna(cc_balance_df['AMT_DRAWINGS_ATM_CURRENT'].mean(),inplace=True)
@@ -69,7 +58,6 @@ def preprocessing_cc_balance():
     cc_balance_df['NAME_CONTRACT_STATUS'] = cc_balance_df['NAME_CONTRACT_STATUS'].astype('category')
     cc_balance_df['CAT_NAME_CONTRACT_STATUS'] = cc_balance_df['NAME_CONTRACT_STATUS'].cat.codes
     cc_balance_df = cc_balance_df.drop(columns=['NAME_CONTRACT_STATUS'])
-    print(cc_balance_df.head().to_string())
 
     return cc_balance_df
 

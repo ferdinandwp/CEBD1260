@@ -283,8 +283,156 @@ def preprocessing_main():
        'EMERGENCYSTATE_MODE':{'No':0,
                               'Yes':1}
     }
-
     main_df.replace(val,inplace=True)
-    return main_df
+
+    # fillna for categorical variable
+    main_df['NAME_TYPE_SUITE'].fillna(value=-1,inplace=True)
+    main_df['OCCUPATION_TYPE'].fillna(value=-1,inplace=True)
+    main_df['FONDKAPREMONT_MODE'].fillna(value=-1,inplace=True)
+    main_df['HOUSETYPE_MODE'].fillna(value=-1,inplace=True)
+    main_df['WALLSMATERIAL_MODE'].fillna(value=-1,inplace=True)
+    main_df['EMERGENCYSTATE_MODE'].fillna(value=-1,inplace=True)
+
+    # data aggregation for numerical features
+    agg_dict = {'CNT_CHILDREN':['mean'],
+                'AMT_INCOME_TOTAL':['mean'],
+                'AMT_CREDIT':['mean'],
+                'AMT_ANNUITY':['mean'],
+                'AMT_GOODS_PRICE':['mean'],
+                'REGION_POPULATION_RELATIVE':['mean'],
+                'DAYS_BIRTH':['mean'],
+                'DAYS_EMPLOYED':['mean'],
+                'DAYS_REGISTRATION':['mean'],
+                'DAYS_ID_PUBLISH':['mean'],
+                'OWN_CAR_AGE':['mean'],
+                'FLAG_MOBIL':['mean'],
+                'FLAG_EMP_PHONE':['mean'],
+                'FLAG_CONT_MOBILE':['mean'],
+                'FLAG_PHONE':['mean'],
+                'FLAG_EMAIL':['mean'],
+                'CNT_FAM_MEMBERS':['mean'],
+                'REGION_RATING_CLIENT':['mean'],
+                'REGION_RATING_CLIENT_W_CITY':['mean'],
+                'HOUR_APPR_PROCESS_START':['mean'],
+                'REG_REGION_NOT_LIVE_REGION':['mean'],
+                'REG_REGION_NOT_WORK_REGION':['mean'],
+                'LIVE_REGION_NOT_WORK_REGION':['mean'],
+                'REG_CITY_NOT_LIVE_CITY':['mean'],
+                'REG_CITY_NOT_WORK_CITY':['mean'],
+                'LIVE_CITY_NOT_WORK_CITY':['mean'],
+                'EXT_SOURCE_1':['mean'],
+                'EXT_SOURCE_2':['mean'],
+                'EXT_SOURCE_3':['mean'],
+                'APARTMENTS_AVG':['mean'],
+                'BASEMENTAREA_AVG':['mean'],
+                'YEARS_BEGINEXPLUATATION_AVG':['mean'],
+                'YEARS_BUILD_AVG':['mean'],
+                'COMMONAREA_AVG':['mean'],
+                'ELEVATORS_AVG':['mean'],
+                'ENTRANCES_AVG':['mean'],
+                'FLOORSMAX_AVG':['mean'],
+                'FLOORSMIN_AVG':['mean'],
+                'LANDAREA_AVG':['mean'],
+                'LIVINGAPARTMENTS_AVG':['mean'],
+                'LIVINGAREA_AVG':['mean'],
+                'NONLIVINGAPARTMENTS_AVG':['mean'],
+                'NONLIVINGAREA_AVG':['mean'],
+                'APARTMENTS_MODE':['mean'],
+                'BASEMENTAREA_MODE':['mean'],
+                'YEARS_BEGINEXPLUATATION_MODE':['mean'],
+                'YEARS_BUILD_MODE':['mean'],
+                'COMMONAREA_MODE':['mean'],
+                'ELEVATORS_MODE':['mean'],
+                'ENTRANCES_MODE':['mean'],
+                'FLOORSMAX_MODE':['mean'],
+                'FLOORSMIN_MODE':['mean'],
+                'LANDAREA_MODE':['mean'],
+                'LIVINGAPARTMENTS_MODE':['mean'],
+                'LIVINGAREA_MODE':['mean'],
+                'NONLIVINGAPARTMENTS_MODE':['mean'],
+                'NONLIVINGAREA_MODE':['mean'],
+                'APARTMENTS_MEDI':['mean'],
+                'BASEMENTAREA_MEDI':['mean'],
+                'YEARS_BEGINEXPLUATATION_MEDI':['mean'],
+                'YEARS_BUILD_MEDI':['mean'],
+                'COMMONAREA_MEDI':['mean'],
+                'ELEVATORS_MEDI':['mean'],
+                'ENTRANCES_MEDI':['mean'],
+                'FLOORSMAX_MEDI':['mean'],
+                'FLOORSMIN_MEDI':['mean'],
+                'LANDAREA_MEDI':['mean'],
+                'LIVINGAPARTMENTS_MEDI':['mean'],
+                'LIVINGAREA_MEDI':['mean'],
+                'NONLIVINGAPARTMENTS_MEDI':['mean'],
+                'NONLIVINGAREA_MEDI':['mean'],
+                'TOTALAREA_MODE':['mean'],
+                'OBS_30_CNT_SOCIAL_CIRCLE':['mean'],
+                'DEF_30_CNT_SOCIAL_CIRCLE':['mean'],
+                'OBS_60_CNT_SOCIAL_CIRCLE':['mean'],
+                'DEF_60_CNT_SOCIAL_CIRCLE':['mean'],
+                'DAYS_LAST_PHONE_CHANGE':['mean'],
+                'FLAG_DOCUMENT_2':['mean'],
+                'FLAG_DOCUMENT_3':['mean'],
+                'FLAG_DOCUMENT_4':['mean'],
+                'FLAG_DOCUMENT_5':['mean'],
+                'FLAG_DOCUMENT_6':['mean'],
+                'FLAG_DOCUMENT_7':['mean'],
+                'FLAG_DOCUMENT_8':['mean'],
+                'FLAG_DOCUMENT_9':['mean'],
+                'FLAG_DOCUMENT_10':['mean'],
+                'FLAG_DOCUMENT_11':['mean'],
+                'FLAG_DOCUMENT_12':['mean'],
+                'FLAG_DOCUMENT_13':['mean'],
+                'FLAG_DOCUMENT_14':['mean'],
+                'FLAG_DOCUMENT_15':['mean'],
+                'FLAG_DOCUMENT_16':['mean'],
+                'FLAG_DOCUMENT_17':['mean'],
+                'FLAG_DOCUMENT_18':['mean'],
+                'FLAG_DOCUMENT_19':['mean'],
+                'FLAG_DOCUMENT_20':['mean'],
+                'FLAG_DOCUMENT_21':['mean'],
+                'AMT_REQ_CREDIT_BUREAU_HOUR':['mean'],
+                'AMT_REQ_CREDIT_BUREAU_DAY':['mean'],
+                'AMT_REQ_CREDIT_BUREAU_WEEK':['mean'],
+                'AMT_REQ_CREDIT_BUREAU_MON':['mean'],
+                'AMT_REQ_CREDIT_BUREAU_QRT':['mean'],
+                'AMT_REQ_CREDIT_BUREAU_YEAR':['mean']}
+
+    num_df = main_df.groupby('SK_ID_CURR').agg(agg_dict)
+    agg_num_df = num_df.reset_index()
+    agg_num_df.columns = ['MAIN_{}_{}'.format(x[0],x[1]) for x in agg_num_df.columns.tolist()]
+    agg_num_df.rename({'MAIN_SK_ID_CURR_':'MAIN_SK_ID_CURR'},axis=1,inplace=True)
+
+    # data aggregation for obj features
+    agg_obj_df = main_df.loc[:,['SK_ID_CURR',
+                                'NAME_CONTRACT_TYPE',
+                                'CODE_GENDER',
+                                'FLAG_OWN_CAR',
+                                'FLAG_OWN_REALTY',
+                                'NAME_TYPE_SUITE',
+                                'NAME_INCOME_TYPE',
+                                'NAME_EDUCATION_TYPE',
+                                'NAME_FAMILY_STATUS',
+                                'NAME_HOUSING_TYPE',
+                                'OCCUPATION_TYPE',
+                                'WEEKDAY_APPR_PROCESS_START',
+                                'ORGANIZATION_TYPE',
+                                'FONDKAPREMONT_MODE',
+                                'HOUSETYPE_MODE',
+                                'WALLSMATERIAL_MODE',
+                                'EMERGENCYSTATE_MODE']]
+
+    agg_obj_df.columns = ['MAIN_{}'.format(x) for x in agg_obj_df.columns.tolist()]
+    agg_obj_df.rename({'MAIN_SK_ID_CURR':'MAIN_SK_ID_CURR'},axis=1,inplace=True)
+    
+    # merge all dataframe
+    # target variable dataframe
+    target_df = main_df.loc[:,['SK_ID_CURR','TARGET']]
+    target_df.rename({'SK_ID_CURR':'MAIN_SK_ID_CURR'},axis=1,inplace=True)
+    
+    all_features_df = agg_num_df.merge(agg_obj_df, on='MAIN_SK_ID_CURR', how='left')
+    main_agg_df = target_df.merge(all_features_df, on='MAIN_SK_ID_CURR', how='left')
+    
+    return main_agg_df
 
 

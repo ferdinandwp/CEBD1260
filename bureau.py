@@ -23,46 +23,64 @@ for f in train_df.columns:
     n = nas[f].sum()
     nacnt[n].append(f)
 
-# replacing the Nan by the mean. When data is normally distributed, we can use average if the data has a skewed
-# distribution, we should use median instead
+# Replacing the Nan by the Median. When data is normally distributed, we can use average (Mean), if data distribution is
+# skewed, we should use Median. Given the time restriction to accomplish this project, we decided to use the Median for
+# all features under the assumption that in a normal distribution, the median and the mean are close to each other.
 
-train_df['DAYS_CREDIT_ENDDATE'].fillna(train_df['DAYS_CREDIT_ENDDATE'].mean(), inplace=True)
-train_df['DAYS_ENDDATE_FACT'].fillna(train_df['DAYS_ENDDATE_FACT'].mean(), inplace=True)
-train_df['AMT_CREDIT_MAX_OVERDUE'].fillna(train_df['AMT_CREDIT_MAX_OVERDUE'].mean(), inplace=True)
-train_df['AMT_CREDIT_SUM'].fillna(train_df['AMT_CREDIT_SUM'].mean(), inplace=True)
-train_df['AMT_CREDIT_SUM_DEBT'].fillna(train_df['AMT_CREDIT_SUM_DEBT'].mean(), inplace=True)
-train_df['AMT_CREDIT_SUM_LIMIT'].fillna(train_df['AMT_CREDIT_SUM_LIMIT'].mean(), inplace=True)
-train_df['AMT_ANNUITY'].fillna(train_df['AMT_ANNUITY'].mean(), inplace=True)
+train_df['DAYS_CREDIT_ENDDATE'].fillna(train_df['DAYS_CREDIT_ENDDATE'].median(), inplace=True)
+train_df['DAYS_ENDDATE_FACT'].fillna(train_df['DAYS_ENDDATE_FACT'].median(), inplace=True)
+train_df['AMT_CREDIT_MAX_OVERDUE'].fillna(train_df['AMT_CREDIT_MAX_OVERDUE'].median(), inplace=True)
+train_df['AMT_CREDIT_SUM'].fillna(train_df['AMT_CREDIT_SUM'].median(), inplace=True)
+train_df['AMT_CREDIT_SUM_DEBT'].fillna(train_df['AMT_CREDIT_SUM_DEBT'].median(), inplace=True)
+train_df['AMT_CREDIT_SUM_LIMIT'].fillna(train_df['AMT_CREDIT_SUM_LIMIT'].median(), inplace=True)
+train_df['AMT_ANNUITY'].fillna(train_df['AMT_ANNUITY'].median(), inplace=True)
 
 # Memory usage prior to optimization
 
 mem_use = train_df.memory_usage().sum() / 1024**3
 print('Memory usage of dataframe is {:.2f} GB'.format(mem_use))
 
-# Picking the proper format
 
+# Encoding the objects by using one-hot-coding
+temp_cractive_df = pd.get_dummies(train_df['CREDIT_ACTIVE'], prefix='CREDIT_ACTIVE')
+train_df = pd.concat([train_df, temp_cractive_df], axis=1)
+
+temp_crcur_df = pd.get_dummies(train_df['CREDIT_CURRENCY'], prefix='CREDIT_CURRENCY')
+train_df = pd.concat([train_df, temp_crcur_df], axis=1)
+
+temp_crtp_df = pd.get_dummies(train_df['CREDIT_TYPE'], prefix='CREDIT_TYPE')
+train_df = pd.concat([train_df, temp_crtp_df], axis=1)
+
+
+
+# Picking the proper format Below was used to determine what format is best once we got our answers, we commented this
+# part off
+########################################################################################################################
 # What is the Type, the Max and the Min of each feature
 
-for f in train_df:
-    print(" {}: Type:{} Max:{} Min:{}".format(f, train_df[f].dtype, train_df[f].max(), train_df[f].min()))
+# for f in train_df:
+#     print(" {}: Type:{} Max:{} Min:{}".format(f, train_df[f].dtype, train_df[f].max(), train_df[f].min()))
 
-# Float16 Max and Min
 
-print("Float16 Max:", np.finfo(np.float16).max, "Float16 Max:", np.finfo(np.float16).min)
+#
+# # Float16 Max and Min
+#
+# print("Float16 Max:", np.finfo(np.float16).max, "Float16 Max:", np.finfo(np.float16).min)
+#
+# # Float32 Max and Min
+#
+# print("Float32 Max:", np.finfo(np.float32).max, "Float32 Max:", np.finfo(np.float32).min)
+#
+# # Int16 Max and Min
+# print("Int8 Max:", np.iinfo(np.int8).max, "Int8 Max:", np.iinfo(np.int8).min)
+#
+# # Int16 Max and Min
+# print("Int16 Max:", np.iinfo(np.int16).max, "Int16 Max:", np.iinfo(np.int16).min)
+#
+# # Int32 Max and Min
+# print("Int32 Max:", np.iinfo(np.int32).max, "Int32 Max:", np.iinfo(np.int32).min)
 
-# Float32 Max and Min
-
-print("Float32 Max:", np.finfo(np.float32).max, "Float32 Max:", np.finfo(np.float32).min)
-
-# Int16 Max and Min
-print("Int8 Max:", np.iinfo(np.int8).max, "Int8 Max:", np.iinfo(np.int8).min)
-
-# Int16 Max and Min
-print("Int16 Max:", np.iinfo(np.int16).max, "Int16 Max:", np.iinfo(np.int16).min)
-
-# Int32 Max and Min
-print("Int32 Max:", np.iinfo(np.int32).max, "Int32 Max:", np.iinfo(np.int32).min)
-
+###############################################################################################
 # Converting to lower format to optimize memory usage
 
 train_df['SK_ID_CURR'] = train_df['SK_ID_CURR'].astype(np.int32)
@@ -86,21 +104,14 @@ train_df['AMT_ANNUITY'] = train_df['AMT_ANNUITY'].astype(np.float32)
 mem_use = train_df.memory_usage().sum() / 1024**3
 print('Memory usage of dataframe is {:.2f} GB'.format(mem_use))
 
-# Encoding the objects by using one-hot-coding
-temp_df = pd.get_dummies(train_df['CREDIT_ACTIVE'], prefix='CREDIT_ACTIVE')
-train_df = pd.concat([train_df, temp_df], axis=1)
-
-temp_df = pd.get_dummies(train_df['CREDIT_CURRENCY'], prefix='CREDIT_CURRENCY')
-train_df = pd.concat([train_df, temp_df], axis=1)
-
-# Encoding remaining object with more than 5 categories using label encoder
-le = LabelEncoder()
-
-le.fit_transform(train_df['CREDIT_TYPE'])
-train_df['CREDIT_TYPE'].factorize(sort=True)
+# # Encoding remaining object with more than 5 categories using label encoder
+# le = LabelEncoder()
+#
+# le.fit_transform(train_df['CREDIT_TYPE'])
+# train_df['CREDIT_TYPE'].factorize(sort=True)
 
 # dropping the one-hot-coded columns (CREDIT_ACTIVE AND CREDIT_CURRENCY)
-train_df.drop(['CREDIT_ACTIVE', 'CREDIT_CURRENCY'], axis=1)
+train_df.drop(['CREDIT_ACTIVE', 'CREDIT_CURRENCY','CREDIT_TYPE'], axis=1)
 
 print(train_df.shape)
 
@@ -113,8 +124,6 @@ client_ids = list(train_df['SK_ID_CURR'].unique())
 temp_df1 = train_df[train_df['SK_ID_CURR'].isin(client_ids)]
 
 agg_dict = {
-    'CREDIT_ACTIVE': ['nunique'],
-    'CREDIT_CURRENCY': ['nunique'],
     'DAYS_CREDIT': ['mean', 'max', 'min'],
     'CREDIT_DAY_OVERDUE': ['mean', 'max', 'min'],
     'DAYS_CREDIT_ENDDATE': ['mean', 'max', 'min'],
@@ -125,7 +134,6 @@ agg_dict = {
     'AMT_CREDIT_SUM_DEBT': ['mean', 'max', 'min'],
     'AMT_CREDIT_SUM_LIMIT': ['mean', 'max', 'min'],
     'AMT_CREDIT_SUM_OVERDUE': ['mean', 'max', 'min'],
-    'CREDIT_TYPE': ['nunique'],
     'DAYS_CREDIT_UPDATE': ['mean', 'max', 'min'],
     'AMT_ANNUITY': ['mean', 'max', 'min']
 }
@@ -134,9 +142,15 @@ agg_df = temp_df1.groupby('SK_ID_CURR').agg(agg_dict)
 # Arrange columns names to be more readable
 agg_df.columns = ['BURO_{}_{}'.format(x[0], x[1]) for x in agg_df.columns.tolist()]
 
-temp_df1 = temp_df1.merge(agg_df, on='SK_ID_CURR', how='left')
+# temp_df1 = temp_df1.merge(agg_df, on='SK_ID_CURR', how='left')
 
-print(temp_df1.shape)
+print(agg_df.shape)
+print(agg_df.head())
 
-for f in temp_df1:
-    print(" {}: Type:{} Max:{} Min:{}".format(f, temp_df1[f].dtype, temp_df1[f].max(), temp_df1[f].min()))
+print(train_df.shape)
+# for f in temp_df1:
+#     print(" {}: Type:{} Max:{} Min:{}".format(f, temp_df1[f].dtype, temp_df1[f].max(), temp_df1[f].min()))
+
+# # Exporting result to CSV
+# export_csv = temp_df1.to_csv(r'C:\Users\KALPAW01\OneDrive - Air Canada\Desktop\Testing_Bureau_df1.csv', index=None, header=True)
+#

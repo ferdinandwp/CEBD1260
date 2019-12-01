@@ -10,20 +10,7 @@ def preprocessing_ipay():
     path = '/Users/ferdinand/Desktop/data'
     file_name = os.path.join(path,'installments_payments.csv')
     ipay_df = pd.read_csv(file_name)
-    print(ipay_df.shape)
-    print('--------------------------------------------------')
-
-    # Check memory size
-    mem_use = ipay_df.memory_usage().sum()/1024**2 # Convert to MB
-    print('Initial dataset memory usage for application_train: {:2f} MB'.format(mem_use))
-    print('--------------------------------------------------')
-
-    # Check max & min of dataset
-    features = [f for f in ipay_df.columns.values]
-    for f in features:
-        print("{}: Max={}; Min={}".format(f,ipay_df[f].max(),ipay_df[f].min()))
-    print('--------------------------------------------------')
-
+    
     # fill na as requried
     ipay_df['DAYS_ENTRY_PAYMENT'].fillna(ipay_df['DAYS_ENTRY_PAYMENT'].mean(),inplace=True)
     ipay_df['AMT_PAYMENT'].fillna(ipay_df['AMT_PAYMENT'].mean(),inplace=True)

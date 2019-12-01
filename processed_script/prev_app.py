@@ -217,7 +217,10 @@ def preprocessing_prev_app():
                                 'POS others without interest':16
                                 }
         }
-
+    # for object dtype, use categorical
+    prev_app_df['NAME_TYPE_SUITE'].fillna(value=-1,inplace=True)
+    prev_app_df['PRODUCT_COMBINATION'].fillna(value=-1,inplace=True)
+    
     prev_app_df.replace(val,inplace=True)
 
     return prev_app_df

@@ -11,9 +11,6 @@ def preprocessing_cc_balance():
     file_name = os.path.join(path,'credit_card_balance.csv')
     cc_balance_df = pd.read_csv(file_name)
 
-    # Check memory size
-    mem_use = cc_balance_df.memory_usage().sum()/1024**2 # Convert to MB
-
     #identify features with int & float
     features = [f for f in cc_balance_df.columns.values]
     nb_features = []
